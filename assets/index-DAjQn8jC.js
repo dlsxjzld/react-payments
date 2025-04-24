@@ -13502,6 +13502,9 @@ const CARD_TYPE_IMAGES_PATH = {
   masterCard: "./Mastercard.png",
   default: ""
 };
+const CARD_PREVIEW_RULE = {
+  SENSITIVE_INFO: 2
+};
 function CardPreview({ cardNumber, cardValidityPeriod }) {
   const { month, year } = cardValidityPeriod;
   const cardType = getCardType(cardNumber.join(""));
@@ -13510,7 +13513,7 @@ function CardPreview({ cardNumber, cardValidityPeriod }) {
     /* @__PURE__ */ jsxRuntimeExports.jsx(IcChip, {}),
     /* @__PURE__ */ jsxRuntimeExports.jsxs(CardInfoWrapper, { children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(CardNumberWrapper, { children: cardNumber.map((number, index) => {
-        if (index < 2) {
+        if (index < CARD_PREVIEW_RULE.SENSITIVE_INFO) {
           return /* @__PURE__ */ jsxRuntimeExports.jsx(CardNumber, { children: number }, index);
         }
         return /* @__PURE__ */ jsxRuntimeExports.jsx(CardNumber, { children: "*".repeat(number.length) }, index);
@@ -13583,14 +13586,13 @@ function CardInputSection({
   errorMessage,
   children
 }) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(Wrapper, { children: [
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(Title, { children: title }),
     description && /* @__PURE__ */ jsxRuntimeExports.jsx(Description, { children: description }),
     children,
     errorMessage && /* @__PURE__ */ jsxRuntimeExports.jsx(ErrorMessage, { children: errorMessage })
   ] });
 }
-const Wrapper = newStyled.section``;
 const Title = newStyled.p`
   font-weight: bold;
   font-size: 18px;
@@ -13614,6 +13616,11 @@ const InputWrapper$3 = newStyled.input`
   border-radius: 2px;
   padding: 8px;
   font-size: 11px;
+  outline: none;
+
+  &:focus {
+    border-color: ${(props) => !props.isError && "black"};
+  }
 `;
 function CardNumberField({
   cardNumber,
@@ -13626,7 +13633,7 @@ function CardNumberField({
       Input,
       {
         isError: isError[index],
-        type: "number",
+        type: "tel",
         name: "cardNumber",
         id: `cardNumber-${index}`,
         value: v,
@@ -13656,13 +13663,13 @@ function CardValidityPeriodField({
   const { month, year } = cardValidityPeriod;
   const { month: isErrorMonth, year: isErrorYear } = isError;
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: "cardValidityPeriod-0", id: "cardValidityPeriod", children: "유효기간" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Label$1, { htmlFor: `cardValidityPeriod-${month}`, id: "cardValidityPeriod", children: "유효기간" }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs(InputWrapper$1, { children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(
         Input,
         {
           isError: isErrorMonth,
-          type: "number",
+          type: "tel",
           name: "cardValidityPeriod",
           id: `cardValidityPeriod-${month}`,
           value: month,
@@ -13677,7 +13684,7 @@ function CardValidityPeriodField({
         Input,
         {
           isError: isErrorYear,
-          type: "number",
+          type: "tel",
           name: "cardValidityPeriod",
           id: `cardValidityPeriod-${year}`,
           value: year,
@@ -13701,15 +13708,15 @@ const Label$1 = newStyled.label`
 `;
 function CardCVCField({ isError, cardCVC, onChange }) {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "CardCVC-0", id: "CardCVC", children: "CVC" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "CardCVC", children: "CVC" }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(InputWrapper, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
       Input,
       {
         isError,
-        type: "number",
+        type: "tel",
         name: "CardCVC",
+        id: "CardCVC",
         value: cardCVC,
-        "aria-labelledby": "CardCVC",
         onChange,
         placeholder: "123",
         min: 0,
@@ -13726,26 +13733,34 @@ const InputWrapper = newStyled.div`
 const Label = newStyled.label`
   font-size: 12px;
 `;
-const ERROR_MESSAGE$1 = {
+const PARSE_RULE$2 = {
+  length: 4
+};
+const CARD_NUMBER_RULE = {
+  min: 0
+};
+const ERROR_MESSAGE$2 = {
   CARD_NUMBER_LENGTH: "카드 번호는 16자리입니다."
 };
 function useCardNumber() {
   const [cardNumber, setCardNumber] = reactExports.useState(["", "", "", ""]);
-  const [isError, setIsError] = reactExports.useState([false, false, false, false]);
-  const [errorMessage, setErrorMessage] = reactExports.useState("");
+  const [errorMessage, setErrorMessage] = reactExports.useState(["", "", "", ""]);
   const onChange = (e, n) => {
     const { value } = e.target;
-    if (value.length > 4) {
+    const isNumeric = value === "" || /^[0-9]+$/.test(value);
+    if (!isNumeric) {
+      return;
+    }
+    if (value.length > PARSE_RULE$2.length) {
       return;
     }
     const checkValidCardNumber = (value2) => {
-      return value2.length < 4 || Number(value2) < 0;
+      return value2.length < PARSE_RULE$2.length || Number(value2) < CARD_NUMBER_RULE.min;
     };
-    const isNotValid = checkValidCardNumber(value);
-    setErrorMessage(isNotValid ? ERROR_MESSAGE$1.CARD_NUMBER_LENGTH : "");
-    setIsError((prev2) => {
+    setErrorMessage((prev2) => {
       const newError = [...prev2];
-      newError[n] = isNotValid;
+      const isNotValid = checkValidCardNumber(value);
+      newError[n] = isNotValid ? ERROR_MESSAGE$2.CARD_NUMBER_LENGTH : "";
       return newError;
     });
     setCardNumber((prev2) => {
@@ -13754,92 +13769,160 @@ function useCardNumber() {
       return newCardNumber;
     });
   };
-  const checkCardNumberError = () => {
-    return isError.some((v) => v === true);
-  };
   return {
     cardNumber,
     onChange,
-    checkCardNumberError,
-    isError,
     errorMessage
   };
 }
+const PARSE_RULE$1 = {
+  length: 2
+};
+const MONTH_RULE = {
+  min: 1,
+  max: 12,
+  length: 2,
+  currentMonth: (/* @__PURE__ */ new Date()).getMonth() + 1
+};
+const YEAR_RULE = {
+  length: 2,
+  currentYear: (/* @__PURE__ */ new Date()).getFullYear()
+};
+const ERROR_MESSAGE$1 = {
+  MONTH_LENGTH: `MM은 ${MONTH_RULE.length}자리여야 합니다.`,
+  YEAR_LENGTH: `YY는 ${YEAR_RULE.length}자리여야 합니다.`,
+  MONTH_RANGE: `MM은 ${MONTH_RULE.min}~${MONTH_RULE.max} 사이의 숫자여야 합니다.`,
+  YEAR_RANGE: `YY는 현재 연도(${Number(
+    YEAR_RULE.currentYear.toString().slice(YEAR_RULE.length)
+  )})보다 크거나 같아야 합니다.`,
+  SAME_YEAR_MONTH_RANGE: `MM은 현재 월(${MONTH_RULE.currentMonth})보다 크거나 같고 최대 월(${MONTH_RULE.max})보다 작거나 같아야 합니다.`
+};
+const YEAR_RANGE_TYPE_RULE = {
+  same: "same",
+  less: "less",
+  greater: "greater"
+};
+const checkMonthLength = (month) => {
+  return month.length === MONTH_RULE.length;
+};
+const checkMonthRange = (month) => {
+  return month >= MONTH_RULE.min && month <= MONTH_RULE.max;
+};
+const checkYearLength = (year) => {
+  return year.length === YEAR_RULE.length;
+};
+const getYearRangeType = (year) => {
+  const currentYear = Number(
+    YEAR_RULE.currentYear.toString().slice(YEAR_RULE.length)
+  );
+  if (year === currentYear) {
+    return YEAR_RANGE_TYPE_RULE.same;
+  }
+  if (year < currentYear) {
+    return YEAR_RANGE_TYPE_RULE.less;
+  }
+  return YEAR_RANGE_TYPE_RULE.greater;
+};
+const checkMonthRangeInSameYear = (month) => {
+  return month >= MONTH_RULE.currentMonth && month <= MONTH_RULE.max;
+};
+const validateCardValidityPeriod = ({
+  month,
+  year
+}) => {
+  const newErrorMessage = {
+    month: "",
+    year: ""
+  };
+  const monthNumber = Number(month);
+  const yearNumber = Number(year);
+  const isValidMonthLength = checkMonthLength(month);
+  const isValidYearLength = checkYearLength(year);
+  if (!isValidMonthLength) {
+    newErrorMessage.month = ERROR_MESSAGE$1.MONTH_LENGTH;
+  } else {
+    if (!checkMonthRange(monthNumber)) {
+      newErrorMessage.month = ERROR_MESSAGE$1.MONTH_RANGE;
+    }
+  }
+  if (!isValidYearLength) {
+    newErrorMessage.year = ERROR_MESSAGE$1.YEAR_LENGTH;
+  } else {
+    const yearRangeType = getYearRangeType(yearNumber);
+    if (yearRangeType === YEAR_RANGE_TYPE_RULE.greater) {
+      newErrorMessage.year = "";
+    } else if (yearRangeType === YEAR_RANGE_TYPE_RULE.less) {
+      newErrorMessage.year = ERROR_MESSAGE$1.YEAR_RANGE;
+    } else if (yearRangeType === YEAR_RANGE_TYPE_RULE.same && !checkMonthRangeInSameYear(monthNumber)) {
+      newErrorMessage.month = ERROR_MESSAGE$1.SAME_YEAR_MONTH_RANGE;
+    }
+  }
+  return newErrorMessage;
+};
 function useCardValidityPeriod() {
   const [cardValidityPeriod, setCardValidityPeriod] = reactExports.useState({
     month: "",
     year: ""
   });
-  const [isErrorCardValidityPeriod, setIsErrorCardValidityPeriod] = reactExports.useState({
-    month: false,
-    year: false
+  const [errorMessage, setErrorMessage] = reactExports.useState({
+    month: "",
+    year: ""
   });
-  const [errorMessage, setErrorMessage] = reactExports.useState("");
   const onChangeCardValidityPeriod = (e, type) => {
     const { value } = e.target;
-    if (value.length > 2) {
+    const isNumeric = value === "" || /^[0-9]+$/.test(value);
+    if (!isNumeric) {
       return;
     }
-    const validatePeriod = {
-      month: (value2) => {
-        const isInvalidMonth = Number.parseInt(value2, 10) > 12 || Number.parseInt(value2, 10) < 1 || value2.length < 2;
-        return isInvalidMonth;
-      },
-      year: (value2) => {
-        const currentYear = Number.parseInt(
-          (/* @__PURE__ */ new Date()).getFullYear().toString().slice(2),
-          10
-        );
-        const isInvalidYear = Number.parseInt(value2, 10) < currentYear || value2.length < 2;
-        return isInvalidYear;
-      }
-    };
-    setErrorMessage(validatePeriod[type](value) ? `MM/YY는 4자리입니다.` : "");
-    setIsErrorCardValidityPeriod((prev2) => ({
-      ...prev2,
-      [type]: validatePeriod[type](value)
-    }));
-    setCardValidityPeriod((prev2) => ({
-      ...prev2,
-      [type]: value.slice(0, 2)
-    }));
-  };
-  const checkCardValidityPeriodError = () => {
-    return Object.values(isErrorCardValidityPeriod).some((v) => v === true);
+    if (value.length > PARSE_RULE$1.length) {
+      return;
+    }
+    const nextMonth = type === "month" ? value : cardValidityPeriod.month;
+    const nextYear = type === "year" ? value : cardValidityPeriod.year;
+    setCardValidityPeriod({
+      month: nextMonth,
+      year: nextYear
+    });
+    const newErrorMessage = validateCardValidityPeriod({
+      month: nextMonth,
+      year: nextYear
+    });
+    setErrorMessage(newErrorMessage);
   };
   return {
     cardValidityPeriod,
-    isErrorCardValidityPeriod,
     onChangeCardValidityPeriod,
-    checkCardValidityPeriodError,
     errorMessage
   };
 }
+const PARSE_RULE = {
+  length: 3
+};
+const CVC_RULE = {
+  min: 0
+};
 const ERROR_MESSAGE = {
   CARD_CVC_LENGTH: "CVC는 3자리입니다."
 };
 function useCardCVC() {
   const [cardCVC, setCardCVC] = reactExports.useState("");
-  const [isCardCVCError, setIsCardCVCError] = reactExports.useState(false);
   const [errorMessage, setErrorMessage] = reactExports.useState("");
   const onChangeCVC = (e) => {
     const { value } = e.target;
-    if (value.length > 3) {
+    const isNumeric = value === "" || /^[0-9]+$/.test(value);
+    if (!isNumeric) {
       return;
     }
-    const isNotValid = value.length < 3 || value.length > 3 || Number(value) < 0;
+    if (value.length > PARSE_RULE.length) {
+      return;
+    }
+    const isNotValid = value.length < PARSE_RULE.length || value.length > PARSE_RULE.length || Number(value) < CVC_RULE.min;
     setErrorMessage(isNotValid ? ERROR_MESSAGE.CARD_CVC_LENGTH : "");
-    setIsCardCVCError(isNotValid);
     setCardCVC(value);
-  };
-  const checkCardCVCError = () => {
-    return isCardCVCError;
   };
   return {
     cardCVC,
-    isCardCVCError,
     onChangeCVC,
-    checkCardCVCError,
     errorMessage
   };
 }
@@ -13847,31 +13930,26 @@ function App() {
   const {
     cardNumber,
     onChange,
-    checkCardNumberError,
-    isError,
     errorMessage: cardNumberErrorMessage
   } = useCardNumber();
   const {
     cardValidityPeriod,
-    isErrorCardValidityPeriod,
     onChangeCardValidityPeriod,
-    checkCardValidityPeriodError,
     errorMessage: cardValidityPeriodErrorMessage
   } = useCardValidityPeriod();
   const {
     cardCVC,
-    isCardCVCError,
     onChangeCVC,
-    checkCardCVCError,
     errorMessage: cardCVCErrorMessage
   } = useCardCVC();
-  const onKeyDown = (e) => {
-    const DISABLED_KEY = "-+.eE";
-    const { key } = e;
-    if (DISABLED_KEY.includes(key)) {
-      e.preventDefault();
-      return;
+  const getErrorMessageFromList = (errorMessageList) => {
+    const filteredErrorMessageList = errorMessageList.filter(
+      (errorMessage) => errorMessage !== ""
+    );
+    if (filteredErrorMessageList.length === 0) {
+      return "";
     }
+    return filteredErrorMessageList[0];
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(AppLayout, { children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -13881,18 +13959,20 @@ function App() {
         cardValidityPeriod
       }
     ),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs(CardForm, { onKeyDown, children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(CardForm, { children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(
         CardInputSection,
         {
           title: "결제할 카드 번호 입력",
           description: "본인 명의의 카드만 결제 가능합니다.",
-          errorMessage: checkCardNumberError() ? cardNumberErrorMessage : "",
+          errorMessage: getErrorMessageFromList(cardNumberErrorMessage),
           children: /* @__PURE__ */ jsxRuntimeExports.jsx(
             CardNumberField,
             {
               cardNumber,
-              isError,
+              isError: cardNumberErrorMessage.map(
+                (errorMessage) => Boolean(errorMessage)
+              ),
               onChange
             }
           )
@@ -13903,12 +13983,17 @@ function App() {
         {
           title: "카드 유효기간을 입력해 주세요",
           description: "월/년도(MMYY)를 순서대로 입력해 주세요.",
-          errorMessage: checkCardValidityPeriodError() ? cardValidityPeriodErrorMessage : "",
+          errorMessage: getErrorMessageFromList(
+            Object.values(cardValidityPeriodErrorMessage)
+          ),
           children: /* @__PURE__ */ jsxRuntimeExports.jsx(
             CardValidityPeriodField,
             {
               cardValidityPeriod,
-              isError: isErrorCardValidityPeriod,
+              isError: {
+                month: Boolean(cardValidityPeriodErrorMessage.month),
+                year: Boolean(cardValidityPeriodErrorMessage.year)
+              },
               onChange: onChangeCardValidityPeriod
             }
           )
@@ -13918,12 +14003,12 @@ function App() {
         CardInputSection,
         {
           title: "CVC 번호를 입력해 주세요",
-          errorMessage: checkCardCVCError() ? cardCVCErrorMessage : "",
+          errorMessage: cardCVCErrorMessage,
           children: /* @__PURE__ */ jsxRuntimeExports.jsx(
             CardCVCField,
             {
               cardCVC,
-              isError: isCardCVCError,
+              isError: Boolean(cardCVCErrorMessage),
               onChange: onChangeCVC
             }
           )
