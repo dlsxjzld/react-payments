@@ -16727,7 +16727,7 @@ function AddCard() {
   } = validation;
   const { canSubmit, step, STEP_NAME } = status;
   const { setCardNumberInputRef, setCardValidityPeriodInputRef } = setInputRef;
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(Layout$1, { children: [
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(Layout$2, { children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       CardPreview,
       {
@@ -16844,7 +16844,7 @@ function AddCard() {
     )
   ] });
 }
-const Layout$1 = newStyled.main`
+const Layout$2 = newStyled.main`
   width: 100%;
   max-width: 400px;
 
@@ -16864,7 +16864,7 @@ function AddCardSuccess() {
   const navigateToAddCard = () => {
     navigate(PAGE_URL.ADD_CARD);
   };
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(Layout, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Wrapper, { children: [
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(Layout$1, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Wrapper, { children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("img", { src: check, alt: "카드 등록 완료" }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs(Title, { children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
@@ -16888,7 +16888,7 @@ function AddCardSuccess() {
     )
   ] }) });
 }
-const Layout = newStyled.main`
+const Layout$1 = newStyled.main`
   width: 100%;
   max-width: 400px;
 
@@ -16933,7 +16933,7 @@ function Notfound() {
   const navigateToAddCard = () => {
     navigate(PAGE_URL.ADD_CARD);
   };
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(Layout, { children: [
     "유효하지 않은 페이지입니다!",
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       Button,
@@ -16946,6 +16946,18 @@ function Notfound() {
     )
   ] });
 }
+const Layout = newStyled.main`
+  width: 100%;
+  max-width: 400px;
+
+  display: flex;
+  flex-direction: column;
+
+  margin: 0 auto;
+  padding: 70px 30px;
+
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 20px;
+`;
 const NotFoundButton = {
   width: "100%",
   padding: "12px 0",
