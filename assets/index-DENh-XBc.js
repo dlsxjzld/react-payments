@@ -16859,8 +16859,14 @@ const Layout$2 = newStyled.main`
 const check = "/react-payments/check.png";
 function AddCardSuccess() {
   const navigate = useNavigate();
-  const { state } = useLocation();
-  const { firstCardNumber, selectedCard } = state;
+  const location = useLocation();
+  reactExports.useEffect(() => {
+    if (!location.state) {
+      navigate(PAGE_URL.NOT_FOUND);
+      return;
+    }
+  }, []);
+  const { firstCardNumber, selectedCard } = location.state;
   const navigateToAddCard = () => {
     navigate(PAGE_URL.ADD_CARD);
   };
