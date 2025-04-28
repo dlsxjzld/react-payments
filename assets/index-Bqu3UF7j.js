@@ -16858,6 +16858,7 @@ const Layout$2 = newStyled.main`
 `;
 const check = "/react-payments/check.png";
 function AddCardSuccess() {
+  var _a, _b;
   const navigate = useNavigate();
   const location = useLocation();
   reactExports.useEffect(() => {
@@ -16866,7 +16867,6 @@ function AddCardSuccess() {
       return;
     }
   }, []);
-  const { firstCardNumber, selectedCard } = location.state;
   const navigateToAddCard = () => {
     navigate(PAGE_URL.ADD_CARD);
   };
@@ -16874,11 +16874,11 @@ function AddCardSuccess() {
     /* @__PURE__ */ jsxRuntimeExports.jsx("img", { src: check, alt: "카드 등록 완료" }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs(Title, { children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
-        firstCardNumber,
+        (_a = location.state) == null ? void 0 : _a.firstCardNumber,
         "로 시작하는"
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
-        selectedCard,
+        (_b = location.state) == null ? void 0 : _b.selectedCard,
         "가 등록되었어요."
       ] })
     ] }),
