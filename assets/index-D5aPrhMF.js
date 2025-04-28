@@ -14322,7 +14322,8 @@ new TextEncoder();
 ]);
 const PAGE_URL = {
   ADD_CARD: "/",
-  ADD_CARD_SUCCESS: "/add-card-success"
+  ADD_CARD_SUCCESS: "/add-card-success",
+  NOT_FOUND: "*"
 };
 function _extends() {
   _extends = Object.assign ? Object.assign.bind() : function(target) {
@@ -16964,7 +16965,7 @@ function App() {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(Routes, { children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(Route, { path: PAGE_URL.ADD_CARD, element: /* @__PURE__ */ jsxRuntimeExports.jsx(AddCard, {}) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(Route, { path: PAGE_URL.ADD_CARD_SUCCESS, element: /* @__PURE__ */ jsxRuntimeExports.jsx(AddCardSuccess, {}) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Route, { path: "*", element: /* @__PURE__ */ jsxRuntimeExports.jsx(Notfound, {}) })
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Route, { path: PAGE_URL.NOT_FOUND, element: /* @__PURE__ */ jsxRuntimeExports.jsx(Notfound, {}) })
   ] });
 }
 ReactDOM.createRoot(document.getElementById("root")).render(
